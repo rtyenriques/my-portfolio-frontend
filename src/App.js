@@ -1,36 +1,58 @@
-// import logo from './logo.svg';
-// import './App.css';
-
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <p>
-//           Edit <code>src/App.js</code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
-import React from "react";
-
-class App extends React.Component {
+import React, { Component } from 'react';
+import axios from 'axios'
+import {BrowserRouter, Routes, Route} from 'react-router-dom'
+import Home from './Home';
+import Signup from './Signup';
+import Login from './Login';
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { 
+      isLoggedIn: false,
+      user: {}
+     };
+  }
+componentDidMount() {
+  this.loginStatus()
+}
+loginStatus = () => {
+    axios.get('http://localhost:3000/logged_in', 
+    {withCredentials: true})    
+.then(response => {
+      if (response.data.logged_in) {
+        this.handleLogin(response)
+      } else {
+        this.handleLogout()
+      }
+    })
+    .catch(error => console.log('api errors:', error))
+  }
+handleLogin = (data) => {
+    this.setState({
+      isLoggedIn: true,
+      user: data.user
+    })
+  }
+handleLogout = () => {
+    this.setState({
+    isLoggedIn: false,
+    user: {}
+    })
+  }
+  
   render() {
     return (
-      <div className="App">
-        App
-        </div>
+      <div>
+         <BrowserRouter>
+          <Routes>
+            <Route exact path='/home' element={<Home />}/>
+            <Route exact path='/login' element={<Login />}/>
+            <Route exact path='/signup' element={<Signup />}/>
+          </Routes>
+        </BrowserRouter>
+        
+      </div>
     );
   }
-
 }
 export default App;
